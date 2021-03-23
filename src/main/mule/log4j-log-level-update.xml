@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b8457007-56eb-4c2b-8416-b5934d188035" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="log4j-log-level-getFlow" doc:id="242916e0-eb08-4e30-a919-93bb94262fe7" >
+		<http:listener doc:name="Listener" doc:id="0c36f3fe-1642-44fb-80f2-d23900e132a9" config-ref="HTTP_Listener_config" path="/getLogLevel"/>
+		<java:invoke-static
+	class="com.logging.LogLevelUtil"
+	method="getLogLevel(String)">
+    <java:args><![CDATA[#[{
+        arg0: payload[0]
+    }]]]></java:args>
+</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="9d8b3236-9852-4202-b263-c93a47231e2b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+		<flow name="log4j-log-level-updateFlow" doc:id="52b46390-abed-40f3-9efe-e6eca757c589" >
+		<http:listener doc:name="Listener" doc:id="78030478-2374-4f79-a4ee-b9238557dac3" config-ref="HTTP_Listener_config" path="/updateLogLevel"/>
+		<java:invoke-static
+	class="com.logging.LogLevelUtil"
+	method="modifyLogLevel(String,String)">
+    <java:args><![CDATA[#[{
+        arg0: payload[0],
+        arg1: payload[1]
+    }]]]></java:args>
+</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="76dcd965-91e1-44b3-8dfe-d8a6fec8d908" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

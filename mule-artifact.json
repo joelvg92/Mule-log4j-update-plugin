@@ -1,0 +1,4 @@
+{
+    "name": "mule-log4j-update-plugin",
+    "minMuleVersion": "4.0.0"
+}
